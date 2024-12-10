@@ -198,28 +198,28 @@ function generarProductos (productos) {
             <p>Precio: $${precio}</p>
             <p>Stock: ${stock}</p>
             </p>
-            <button class=agregarAlCarrito id=agc${id}">Agregar al carrito</button>
+            <button class=agregarAlCarrito id="agc${id}">Agregar al carrito</button>
             `;
         contenedor.append(card);
     }
 )};
 
-function agregarCarrito(event, id, nombre, precio) {
+function agregarCarrito (e, productos) {
     let carrito = recuperarCarrito();
-    let idProducto = Number(event.target.id.substring(3));
-    let indiceCarrito = carrito.findIndex(({ id }) => id === idProducto);
-    if (indiceCarrito === -1) {
+    let id = Number(e.target.id.substring(3));
+    productos = carrito.findIndex(producto => producto.id === id);
+    if (productos === -1) {
         carrito.push({
-            id: id,
-            nombre: nombre,
-            precioUnitario: precio,
+            id: [productos].id,
+            nombre: [productos].nombre,
+            precioUnitario: [productos].precio,
             unidades: 1,
-            subtotal: precio
+            subtotal: [productos].precio
         });
     
     } else {
-        carrito[indiceCarrito].unidades++;
-        carrito[indiceCarrito].subtotal = carrito[indiceCarrito].unidades * carrito[indiceCarrito].precioUnitario;
+        carrito[productos].unidades++;
+        carrito[productos].subtotal = carrito[productos].unidades * carrito[productos].precioUnitario;
     }
 
     guardarCarrito(carrito);
@@ -237,21 +237,22 @@ function mostrarCarrito (carrito) {
             <p>${nombre}</p>
             <p>$${precioUnitario}</p>
             <div class=unidades>
-            <button id=run${id}> - </button> 
+            <button id="run${id}"> - </button> 
             <p>${unidades}</p>
-            <button id=sun${id}> + </button>
+            <button id="sun${id}"> + </button>
             </div>
             <p>$${subtotal}</p>
-            <p><button class=eliminarProducto id=tca${id}>Eliminar</button></p>
+            <p><button class=eliminarProducto id="${id}">Eliminar</button></p>
             `;
         carritoHTML.append(fila);
         fila.querySelector(".eliminarProducto").addEventListener("click", eliminarProducto);
-
+        
         let restar = document.getElementById("run" + id);
         restar.addEventListener("click", restarUnidad);
-    
+        
         let sumar = document.getElementById("sun" + id);
         sumar.addEventListener("click", sumarUnidad);
+
     });
 
     let total = calcularTotal(carrito);
