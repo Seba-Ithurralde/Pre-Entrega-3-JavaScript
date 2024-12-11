@@ -7,7 +7,7 @@
 body
 {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
-    background-color: beige;
+    background-image: linear-gradient(aquamarine, blue);
 }
 
 #buscar
@@ -142,27 +142,28 @@ body
 
 #contenedor
 {
-    width: 250px;
-    height: 350px;
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    justify-content: center;
-    gap: 50px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
 }
 
-.productos
+article
 {
-    height: 250px;
-    width: 300px;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 1rem;
+    border: 2px solid #4CAF50;
+    background-color: white;
 }
 
 .card img
 {
-    max-width: 100%;
-    height: 200px;
-    background-color: white;
+    border: 2px solid black;
+    width: 250px;
+    margin: 10px;
+    border-radius: 1rem;
 }
+
 
 h1
 {

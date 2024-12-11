@@ -193,12 +193,14 @@ function generarProductos (productos) {
         let card = document.createElement("div");
         card.classList.add("card");
         card.innerHTML = `
+            <article>
             <img src="${image}" alt="${nombre}">
             <h3>${nombre}</h3>
             <p>Precio: $${precio}</p>
             <p>Stock: ${stock}</p>
             </p>
             <button class=agregarAlCarrito id="agc${id}">Agregar al carrito</button>
+            </article>
             `;
         contenedor.append(card);
     }
@@ -206,20 +208,22 @@ function generarProductos (productos) {
 
 function agregarCarrito (e, productos) {
     let carrito = recuperarCarrito();
-    let id = Number(e.target.id.substring(3));
-    productos = carrito.findIndex(producto => producto.id === id);
-    if (productos === -1) {
+    let idProducto = Number(e.target.id.substring(3));
+    let producto = productos.find(p => p.id === idProducto);
+    let { nombre, id, precio, } = producto;
+    let indiceCarrito = carrito.findIndex(producto => producto.id === idProducto);
+    if (indiceCarrito === -1) {
         carrito.push({
-            id: [productos].id,
-            nombre: [productos].nombre,
-            precioUnitario: [productos].precio,
+            id: id,
+            nombre: nombre,
+            precioUnitario: precio,
             unidades: 1,
-            subtotal: [productos].precio
+            subtotal: precio
         });
     
     } else {
-        carrito[productos].unidades++;
-        carrito[productos].subtotal = carrito[productos].unidades * carrito[productos].precioUnitario;
+        carrito[indiceCarrito].unidades++;
+        carrito[indiceCarrito].subtotal = carrito[indiceCarrito].unidades * carrito[indiceCarrito].precioUnitario;
     }
 
     guardarCarrito(carrito);
