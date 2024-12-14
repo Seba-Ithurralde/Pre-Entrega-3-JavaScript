@@ -1,94 +1,13 @@
-function principal () {
-    let productos = [
-        {
-            id: 1,
-            nombre: 'Notebook Gamer ASUS',
-            precio: 1799,
-            stock: 10,
-            categoria: 'computacion',
-            image: "img/notebookasus.png"
-        },
-        {
-            id: 2,
-            nombre: 'Mouse Logitech',
-            precio: 69,
-            stock: 20,
-            categoria: 'accesorios',
-            image: "img/mouselogitech.jpg"
-        },
-        {
-            id: 3,
-            nombre: 'Teclado ASUS',
-            precio: 129,
-            stock: 5,
-            categoria: 'accesorios',
-            image: "img/tecladoasus.jpg"
-        },
-        {
-            id: 4,
-            nombre: 'Monitor 27" Samsung',
-            precio: 1299,
-            stock: 8,
-            categoria: 'computacion',
-            image: "img/monitorsamsung.jpg"
-        },
-        {
-            id: 5,
-            nombre: 'Headset Oculus Rift',
-            precio: 499,
-            stock: 15,
-            categoria: 'reproductores',
-            image: "img/headset.jpg"
-        },
-        {
-            id: 6,
-            nombre: 'Smartphone Samsung Galaxy',
-            precio: 899,
-            stock: 12,
-            categoria: 'celulares',
-            image: "img/samsunggalaxy.jpg"
-        },
-        {
-            id: 7,
-            nombre: 'Smartwatch Apple Watch',
-            precio: 249,
-            stock: 25,
-            categoria: 'reproductores',
-            image: "img/AppleWatch.jpg"
-        },
-        {
-            id: 8,
-            nombre: 'Disco Duro SSD 1TB',
-            precio: 149,
-            stock: 15,
-            categoria: 'accesorios',
-            image: "img/discoSSD.jpg"
-        },
-        {
-            id: 9,
-            nombre: 'Adaptador USB Type-C',
-            precio: 39,
-            stock: 30,
-            categoria: 'accesorios',
-            image: "img/USB.jpg"
-        },
-        {
-            id: 10,
-            nombre: 'Camara IP',
-            precio: 199,
-            stock: 20,
-            categoria: 'reproductores',
-            image: "img/camaraIP.png"
-        },
-        {
-            id: 11,
-            nombre: 'Iphone 15 Pro Max',
-            precio: 1369,
-            stock: 12,
-            categoria: 'celulares',
-            image: "img/iphone15promax.jpg"
-        }
-    ]
+function pedirProductos() {
+    fetch("./products.json")
+    .then(response => response.json())
+    .then(productos => principal(productos))
+    .catch(error => sweetAlert(error, "Hubo un error al intentar mostrar los productos", "error"));
+}
+
+pedirProductos();
+
+function principal (productos) {
 
     let carrito = recuperarCarrito("carrito");
     mostrarCarrito(carrito);
@@ -104,8 +23,8 @@ function principal () {
     let botonProductosCarrito = document.getElementById("productosCarrito");
     botonProductosCarrito.addEventListener("click", ocultarCarrito)
 
-    let botonProductos = document.getElementsByClassName("agregarAlCarrito");
-    for (const boton of botonProductos) {  
+    let botonProducts = document.getElementsByClassName("agregarAlCarrito");
+    for (const boton of botonProducts) {  
         boton.addEventListener("click", (e) => agregarCarrito(e, productos));
     }
 
@@ -139,18 +58,20 @@ function vaciarCarrito() {
 
 function actualizarTotal(total) {
     let elementoTotal = document.getElementById("total");
-    if (elementoTotal === 0) {
-        elementoTotal.innerText = "No hay productos en el carrito";
-    } 
-    else {
-        elementoTotal.innerText = "Total de la compra: $" + total
-    }
+    elementoTotal.innerText = "Total de la compra: $" + total
 }
 
 function comprarProductos () {
     mostrarCarrito([]);
     localStorage.removeItem("carrito");
-    alert("Muchas gracias por su compra!");
+    Toastify({
+        text: `¡Muchas gracias por su compra!`,
+        duration: 3000,
+        style: 
+        {
+            background: "linear-gradient( rgb(255, 82, 82), rgb(110, 77, 143))",
+        }
+      }).showToast();
 }
 
 function buscarProductos (productos) {
@@ -161,9 +82,9 @@ function buscarProductos (productos) {
 
 function botonProductos (e, productos) {
     if (e.keyCode === 13) {
-    let productosFiltrados = filtrar(e.target.value, productos);
-    generarProductos(productosFiltrados);
-    }
+        let productosFiltrados = filtrar(e.target.value, productos);
+        generarProductos(productosFiltrados);
+}
 
     e.target.value === "" && generarProductos(productos);
 }
@@ -175,15 +96,11 @@ function filtrar (valor, productos) {
 function ocultarCarrito (e) {
     let carrito = document.getElementById("pantallaCarrito");
     let contenedorProductos = document.getElementById("pantallaProductos");
+    
     carrito.classList.toggle("ocultar");
     contenedorProductos.classList.toggle("ocultar");
        
-    if(e.target.innerText === "Carrito") {
-       e.target.innerText = "Productos";
-    } 
-    else {
-        e.target.innerText = "Carrito";
-    }
+    e.target.innerText = e.target.innerText === "Carrito" ? "Productos" : "Carrito";
 }
 
 function generarProductos (productos) {
@@ -191,7 +108,7 @@ function generarProductos (productos) {
     contenedor.innerHTML = ""; 
     productos.forEach(({ image, nombre, precio, stock, id }) => {
         let card = document.createElement("div");
-        card.classList.add("card");
+        card.className = "card";
         card.innerHTML = `
             <article>
             <img src="${image}" alt="${nombre}">
@@ -202,16 +119,17 @@ function generarProductos (productos) {
             <button class=agregarAlCarrito id="agc${id}">Agregar al carrito</button>
             </article>
             `;
+
         contenedor.append(card);
-    }
-)};
+    });
+}
 
 function agregarCarrito (e, productos) {
     let carrito = recuperarCarrito();
     let idProducto = Number(e.target.id.substring(3));
-    let producto = productos.find(p => p.id === idProducto);
-    let { nombre, id, precio, } = producto;
-    let indiceCarrito = carrito.findIndex(producto => producto.id === idProducto);
+    let producto = productos.find(({ id }) => id === idProducto);
+    let { nombre, id, precio } = producto;
+    let indiceCarrito = carrito.findIndex(({ id }) => id === idProducto);
     if (indiceCarrito === -1) {
         carrito.push({
             id: id,
@@ -230,6 +148,15 @@ function agregarCarrito (e, productos) {
     mostrarCarrito(carrito);
     const total = calcularTotal(carrito);
     actualizarTotal(total);
+
+    Toastify({
+        text: `Se agregó ${nombre} al carrito`,
+        duration: 3000,
+        style: 
+        {
+          background: "linear-gradient(to right, #00b09b, #96c93d)",
+        }
+      }).showToast();
 }
 
 function mostrarCarrito (carrito) {
@@ -246,17 +173,19 @@ function mostrarCarrito (carrito) {
             <button id="sun${id}"> + </button>
             </div>
             <p>$${subtotal}</p>
-            <p><button class=eliminarProducto id="${id}">Eliminar</button></p>
+            <p><button class=eliminarProducto id="eli${id}">Eliminar</button></p>
             `;
-        carritoHTML.append(fila);
-        fila.querySelector(".eliminarProducto").addEventListener("click", eliminarProducto);
-        
-        let restar = document.getElementById("run" + id);
-        restar.addEventListener("click", restarUnidad);
-        
-        let sumar = document.getElementById("sun" + id);
-        sumar.addEventListener("click", sumarUnidad);
+            
+            carritoHTML.append(fila);
 
+            let botonEliminar = document.getElementById("eli" + id);
+            botonEliminar.addEventListener("click", eliminarProducto);
+            
+            let restar = document.getElementById("run" + id);
+            restar.addEventListener("click", restarUnidad);
+            
+            let sumar = document.getElementById("sun" + id);
+            sumar.addEventListener("click", sumarUnidad);
     });
 
     let total = calcularTotal(carrito);
@@ -267,7 +196,7 @@ function restarUnidad (e) {
     let id = Number(e.target.id.substring(3));
     let carrito = recuperarCarrito();
     let indiceCarrito = carrito.findIndex(producto => producto.id === id);
-    if (indiceCarrito !== -1 && carrito[indiceCarrito].unidades > 1) {
+    if (indiceCarrito !== -1 && indiceCarrito > 1) {
         carrito[indiceCarrito].unidades--;
         carrito[indiceCarrito].subtotal = carrito[indiceCarrito].unidades * carrito[indiceCarrito].precioUnitario;
         guardarCarrito(carrito);
@@ -303,12 +232,12 @@ function guardarCarrito (clave, valor) {
 }
 
 function recuperarCarrito () {
-    let valorCarrito = localStorage.getItem("carrito");
-    let carrito = JSON.parse(valorCarrito); 
-    if (!carrito) {
-        carrito = [];
+    let carrito = localStorage.getItem("carrito");
+    if (carrito) {
+        return JSON.parse(carrito);
+    } else {
+        return [];
     }
-    return carrito;
 }
 
 function eliminarProducto(e) {
@@ -323,4 +252,12 @@ function eliminarProducto(e) {
     guardarCarrito(carrito);
     const total = calcularTotal(carrito);
     actualizarTotal(total);
+}
+
+function sweetAlert(title, text, icon) {
+    Swal.fire({
+        title,
+        text,
+        icon,
+    });
 }
